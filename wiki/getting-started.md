@@ -1,56 +1,49 @@
 ---
-title: Getting Started
-order: 2
+title: Teste
+order: 1
 ---
 
-# Getting Started
+# Introduction
 
-## Development
+Welcome to the **SerJunior** wiki. This page is a markdown file located at `wiki/introduction.md`.
 
-```bash
-npm install
-npm run dev
-```
+## How the wiki works
 
-The app runs at `http://localhost:5173`. The wiki renders at `/#/wiki/introduction`.
+All markdown files inside the `wiki/` folder are automatically picked up and listed in the sidebar. The sidebar is generated at build time — no manual config needed.
 
-## Building
+## Frontmatter fields
 
-```bash
-npm run build
-```
+Each page supports the following frontmatter fields at the top of the file:
 
-Output lands in `dist/`.
+| Field     | Type    | Description                                          |
+|-----------|---------|------------------------------------------------------|
+| `title`   | string  | Display name in the sidebar (falls back to filename) |
+| `order`   | number  | Sort order within the section (default: 999)         |
+| `section` | string  | Override the section heading for subdirectory pages  |
 
-## Deployment
+## Raw HTML
 
-Push to `main` — the GitHub Actions workflow builds and deploys to the `gh-pages` branch automatically.
+Because `rehype-raw` is enabled, you can drop raw HTML anywhere in your markdown:
 
-> **Note:** Make sure GitHub Pages is set to serve from the `gh-pages` branch in your repository settings.
-
-## Writing wiki pages
-
-Create a markdown file in `wiki/`, add frontmatter, and you're done:
-
-```markdown
----
-title: My New Page
-order: 3
----
-
-# My New Page
-
-Content goes here. You can use **Markdown**, `code`, and even raw HTML.
-
-<div class="my-custom-class">
-  <p>Custom HTML layout!</p>
+<div style="background: #ede9fe; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+  <strong>Custom HTML block</strong> — style it however you like.
 </div>
+
+## Adding pages
+
+1. Create a `.md` file anywhere inside `wiki/`
+2. Add frontmatter with at least a `title`
+3. The sidebar updates automatically on the next build (or hot-reload in dev)
+
+## Subdirectory sections
+
+Files in subdirectories become sidebar sections:
+
 ```
-
-## Styling
-
-- **Wiki styles** → `src/styles/wiki.css`
-- **Landing page styles** → `src/styles/landing.css`
-- **Global / CSS variables** → `src/styles/global.css`
-
-CSS variables are defined in `global.css` and used everywhere, so changing a color in one place updates the whole site.
+wiki/
+  introduction.md       ← root level
+  getting-started.md    ← root level
+  advanced/
+    configuration.md    ← "Advanced" section
+    deployment.md       ← "Advanced" section
+```

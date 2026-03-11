@@ -1,27 +1,28 @@
-// Eagerly imports all wiki markdown files as raw strings.
-// Frontmatter fields used for the sidebar:
-//   title  – display name (falls back to filename)
-//   order  – numeric sort order within its section (default: 999)
-//   section – override the directory name used as section heading
-
-export interface SidebarItem {
-  title: string
-  slug: string   // path relative to wiki/, without .md  e.g. "introduction" or "advanced/config"
-  order: number
-}
-
-export interface SidebarSection {
-  title: string
-  order: number
-  items: SidebarItem[]
-}
-
-// Glob all markdown files — Vite bundles them as raw strings at build time.
 const rawFiles = import.meta.glob('/wiki/**/*.md', {
   query: '?raw',
   import: 'default',
   eager: true,
 }) as Record<string, string>
+
+// ─── Types ─────────────────────────────────────────────────────────────────
+
+export type SidebarNode = SidebarPage | SidebarSection
+
+export interface SidebarPage {
+  kind: 'page'
+  title: string
+  slug: string
+  order: number
+}
+
+export interface SidebarSection {
+  kind: 'section'
+  title: string
+  order: number          // derived from minimum child order
+  children: SidebarNode[]
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function parseFrontmatter(raw: string): Record<string, string | number> {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/)
@@ -37,68 +38,87 @@ function parseFrontmatter(raw: string): Record<string, string | number> {
   return result
 }
 
-function titleFromSlug(slug: string): string {
-  const parts = slug.split('/')
-  const name = parts[parts.length - 1] ?? slug
-  return name
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c: string) => c.toUpperCase())
+// Parses an optional numeric prefix like "01-", "3-", "10-" from a name.
+// "01-advanced" → { cleanName: "advanced", order: 1 }
+// "introduction"  → { cleanName: "introduction", order: 999 }
+function parseNameAndOrder(name: string): { cleanName: string; order: number } {
+  const match = name.match(/^(\d+)-(.+)$/)
+  if (match) return { cleanName: match[2], order: parseInt(match[1], 10) }
+  return { cleanName: name, order: 999 }
 }
 
-function sectionTitleFromPath(dir: string): string {
-  return dir
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c: string) => c.toUpperCase())
+function toTitle(name: string): string {
+  return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
 }
 
-export function useSidebar(): SidebarSection[] {
-  const sections: Map<string, SidebarSection> = new Map()
+// ─── Tree builder ────────────────────────────────────────────────────────────
+
+function getOrCreateSection(nodes: SidebarNode[], dirName: string): SidebarSection {
+  const { cleanName, order } = parseNameAndOrder(dirName)
+  const title = toTitle(cleanName)
+
+  const existing = nodes.find(
+    (n): n is SidebarSection => n.kind === 'section' && n.title === title
+  )
+  if (existing) return existing
+
+  const section: SidebarSection = { kind: 'section', title, order, children: [] }
+  nodes.push(section)
+  return section
+}
+
+function insertNode(
+  nodes: SidebarNode[],
+  pathParts: string[],
+  fullSlug: string,
+  fm: Record<string, string | number>
+) {
+  if (pathParts.length === 1) {
+    const { cleanName, order: prefixOrder } = parseNameAndOrder(pathParts[0])
+    nodes.push({
+      kind: 'page',
+      title: (fm.title as string) ?? toTitle(cleanName),
+      slug: fullSlug,
+      // frontmatter `order` wins, then filename prefix, then 999
+      order: (fm.order as number) ?? prefixOrder,
+    })
+    return
+  }
+
+  const section = getOrCreateSection(nodes, pathParts[0])
+  insertNode(section.children, pathParts.slice(1), fullSlug, fm)
+}
+
+function sortNodes(nodes: SidebarNode[]): SidebarNode[] {
+  for (const node of nodes) {
+    if (node.kind === 'section') {
+      node.children = sortNodes(node.children)
+      // Only fall back to min-child order when no prefix was set (order === 999)
+      if (node.order === 999) {
+        node.order = Math.min(...node.children.map(c => c.order))
+      }
+    }
+  }
+  return nodes.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title))
+}
+
+// ─── Public API ──────────────────────────────────────────────────────────────
+
+export function buildSidebar(): SidebarNode[] {
+  const roots: SidebarNode[] = []
 
   for (const [path, raw] of Object.entries(rawFiles)) {
-    // path looks like /wiki/introduction.md or /wiki/advanced/config.md
     const slug = path.replace(/^\/wiki\//, '').replace(/\.md$/, '')
     const parts = slug.split('/')
-    const sectionKey = parts.length > 1 ? parts.slice(0, -1).join('/') : '__root__'
-
     const fm = parseFrontmatter(raw)
-    const item: SidebarItem = {
-      title: (fm.title as string) ?? titleFromSlug(slug),
-      slug,
-      order: (fm.order as number) ?? 999,
-    }
-
-    if (!sections.has(sectionKey)) {
-      const sectionTitle =
-        sectionKey === '__root__'
-          ? '__root__'
-          : (fm.section as string) ?? sectionTitleFromPath(sectionKey)
-      sections.set(sectionKey, {
-        title: sectionTitle,
-        order: sectionKey === '__root__' ? 0 : (fm.order as number) ?? 999,
-        items: [],
-      })
-    }
-
-    sections.get(sectionKey)!.items.push(item)
+    insertNode(roots, parts, slug, fm)
   }
 
-  // Sort items within each section
-  for (const section of sections.values()) {
-    section.items.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title))
-  }
-
-  // Sort sections: root first, then by order/title
-  return Array.from(sections.values()).sort((a, b) => {
-    if (a.title === '__root__') return -1
-    if (b.title === '__root__') return 1
-    return a.order - b.order || a.title.localeCompare(b.title)
-  })
+  return sortNodes(roots)
 }
 
 export function loadWikiPage(slug: string): string | null {
-  const path = `/wiki/${slug}.md`
-  const raw = rawFiles[path]
+  const raw = rawFiles[`/wiki/${slug}.md`]
   if (!raw) return null
-  // Strip frontmatter before returning content
   return raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
 }

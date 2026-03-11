@@ -7,10 +7,10 @@ import { loadWikiPage } from './useSidebar'
 import '../styles/wiki.css'
 
 export default function WikiPage() {
-  const { section, slug } = useParams<{ section?: string; slug?: string }>()
-  const fullSlug = section && slug ? `${section}/${slug}` : (slug ?? '')
+  const params = useParams()
+  const slug = params['*'] ?? ''
 
-  const content = loadWikiPage(fullSlug)
+  const content = loadWikiPage(slug)
 
   return (
     <div className="wiki-layout">
@@ -19,7 +19,7 @@ export default function WikiPage() {
         {content === null ? (
           <div className="wiki-not-found">
             <h1>Page not found</h1>
-            <p>No wiki page exists at <code>{fullSlug}</code>.</p>
+            <p>No wiki page exists at <code>{slug}</code>.</p>
           </div>
         ) : (
           <article className="wiki-article">
