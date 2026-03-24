@@ -4,13 +4,14 @@
   padding: 0;
 }
 
+
 :root {
   --color-bg: #ffffff;
-  --color-text: #1a1a2e;
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
+  --color-text: #000;
+  --color-primary: #024668;
+  --color-primary-hover: #015d8b;
+  --color-muted: #0000009f;
+  --color-border: #ebe5e5;
   --font-sans: system-ui, -apple-system, sans-serif;
   --font-mono: 'Fira Code', 'Cascadia Code', monospace;
 }

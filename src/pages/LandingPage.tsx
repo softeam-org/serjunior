@@ -6,16 +6,16 @@ export default function LandingPage() {
     <div className="landing">
       <header className="landing-header">
         <nav className="landing-nav">
-          <span className="landing-logo">SerJunior</span>
+          <span className="landing-logo">SERJÚNIOR</span>
           <Link to="/wiki" className="landing-nav-link">Wiki</Link>
         </nav>
       </header>
 
       <main className="landing-main">
         <section className="landing-hero">
-          <h1 className="landing-hero-title">SerJunior</h1>
+          <h1 className="landing-hero-title">SERJÚNIOR</h1>
           <p className="landing-hero-subtitle">
-            Your subtitle goes here.
+            Federação Sergipana de Empresas Juniores
           </p>
           <div className="landing-hero-actions">
             <Link to="/wiki" className="btn btn-primary">Read the Wiki</Link>
@@ -30,7 +30,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="landing-footer">
-        <p>&copy; {new Date().getFullYear()} SerJunior</p>
+        <p>&copy; {new Date().getFullYear()} SERJÚNIOR</p>
       </footer>
     </div>
   )
