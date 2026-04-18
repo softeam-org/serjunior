@@ -12,7 +12,6 @@ import {
   fmtIndex,
   fmtPct,
   type CompanyData,
-  type Cluster,
 } from '../utils/cluster'
 
 interface Props { data: CompanyData }

@@ -36,7 +36,6 @@ function NumInput({
   numValue: number
   onNumChange: (v: number) => void
   placeholder?: string
-  step?: number
 }) {
   // Inicializa vazio quando o valor é 0, para o usuário digitar livremente
   const [text, setText] = useState(() => (numValue === 0 ? '' : String(numValue)))
@@ -122,7 +121,6 @@ export default function Onboarding({ initial, onComplete }: Props) {
           numValue={form[key] as number}
           onNumChange={(v) => set(key, v as CompanyData[typeof key])}
           placeholder={opts.placeholder}
-          step={opts.step}
         />
         {errors[key] && (
           <span style={{ fontSize: '0.72rem', color: '#dc2626' }}>{errors[key]}</span>

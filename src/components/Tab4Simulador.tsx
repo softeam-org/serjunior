@@ -7,7 +7,6 @@ import {
   getClusterIndex,
   getCollabPct,
   applyMovementRule,
-  BRL,
   fmtIndex,
   fmtPct,
   type CompanyData,
