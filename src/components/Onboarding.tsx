@@ -36,6 +36,7 @@ function NumInput({
   numValue: number
   onNumChange: (v: number) => void
   placeholder?: string
+  step?: number
 }) {
   // Inicializa vazio quando o valor é 0, para o usuário digitar livremente
   const [text, setText] = useState(() => (numValue === 0 ? '' : String(numValue)))
@@ -63,6 +64,7 @@ function NumInput({
       inputMode="decimal"
       placeholder={placeholder ?? '0'}
       value={text}
+      step={step}
       onChange={handleChange}
       onBlur={handleBlur}
     />
