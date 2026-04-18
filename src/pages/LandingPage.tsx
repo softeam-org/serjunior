@@ -8,6 +8,7 @@ export default function LandingPage() {
         <nav className="landing-nav">
           <span className="landing-logo">SerJunior</span>
           <Link to="/wiki" className="landing-nav-link">Wiki</Link>
+          <Link to="/dashboard" className="landing-nav-link">Dashboard de Cluster</Link>
         </nav>
       </header>
 
