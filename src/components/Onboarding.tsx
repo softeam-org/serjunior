@@ -20,6 +20,56 @@ const BLANK: CompanyData = {
   targetCollabRevenue: 0,
 }
 
+/**
+ * Input numérico que mantém estado de exibição (string) separado do valor
+ * semântico (number). Isso evita o "0 preso" do type="number" controlado,
+ * onde o browser bloqueia digitação enquanto o campo mostra "0".
+ *
+ * Aceita vírgula como separador decimal (padrão pt-BR).
+ */
+function NumInput({
+  numValue,
+  onNumChange,
+  placeholder,
+  step,
+}: {
+  numValue: number
+  onNumChange: (v: number) => void
+  placeholder?: string
+  step?: number
+}) {
+  // Inicializa vazio quando o valor é 0, para o usuário digitar livremente
+  const [text, setText] = useState(() => (numValue === 0 ? '' : String(numValue)))
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value
+    setText(raw)
+    // Aceita vírgula como decimal (pt-BR)
+    const norm = raw.replace(',', '.')
+    const parsed = parseFloat(norm)
+    onNumChange(isNaN(parsed) ? 0 : parsed)
+  }
+
+  function handleBlur() {
+    // Normaliza a exibição ao sair do campo
+    const norm = text.replace(',', '.')
+    const parsed = parseFloat(norm)
+    setText(isNaN(parsed) || parsed === 0 ? '' : String(parsed))
+  }
+
+  return (
+    <input
+      className="ob-input"
+      type="text"
+      inputMode="decimal"
+      placeholder={placeholder ?? '0'}
+      value={text}
+      onChange={handleChange}
+      onBlur={handleBlur}
+    />
+  )
+}
+
 export default function Onboarding({ initial, onComplete }: Props) {
   const [form, setForm] = useState<CompanyData>(initial ?? BLANK)
   const [errors, setErrors] = useState<Partial<Record<keyof CompanyData, string>>>({})
@@ -39,7 +89,8 @@ export default function Onboarding({ initial, onComplete }: Props) {
     if (form.collabRevenue > form.revenue && form.revenue > 0)
       errs.collabRevenue = 'Não pode exceder o faturamento total'
     if (form.targetRevenue <= 0) errs.targetRevenue = 'Deve ser > 0'
-    if (form.targetCsat <= CSAT_MIN || form.targetCsat > CSAT_MAX) errs.targetCsat = `Entre 0,1 e ${CSAT_MAX},0`
+    if (form.targetCsat <= CSAT_MIN || form.targetCsat > CSAT_MAX)
+      errs.targetCsat = `Entre 0,1 e ${CSAT_MAX},0`
     if (form.targetMejEngagement < 0 || form.targetMejEngagement > 100)
       errs.targetMejEngagement = 'Entre 0 e 100%'
     if (form.targetCollabRevenue < 0) errs.targetCollabRevenue = 'Deve ser ≥ 0'
@@ -52,27 +103,30 @@ export default function Onboarding({ initial, onComplete }: Props) {
     if (validate()) onComplete(form)
   }
 
-  function numField(key: keyof CompanyData, label: string, opts: {
-    min?: number; max?: number; step?: number; placeholder?: string; hint?: string
-  } = {}) {
+  function numField(
+    key: keyof CompanyData,
+    label: string,
+    opts: { placeholder?: string; step?: number; hint?: string } = {},
+  ) {
     return (
       <div className="ob-field">
-        <label className="ob-label">{label}{opts.hint && <span style={{ color: 'var(--db-muted)', fontWeight: 400, marginLeft: 4 }}>({opts.hint})</span>}</label>
-        <input
-          className="ob-input"
-          type="number"
-          min={opts.min ?? 0}
-          max={opts.max}
-          step={opts.step ?? 1}
-          placeholder={opts.placeholder ?? '0'}
-          value={form[key] as number}
-          onChange={(e) => {
-            const raw = e.target.value
-            const parsed = parseFloat(raw)
-            set(key, isNaN(parsed) ? 0 : parsed)
-          }}
+        <label className="ob-label">
+          {label}
+          {opts.hint && (
+            <span style={{ color: 'var(--color-muted)', fontWeight: 400, marginLeft: 4 }}>
+              ({opts.hint})
+            </span>
+          )}
+        </label>
+        <NumInput
+          numValue={form[key] as number}
+          onNumChange={(v) => set(key, v as CompanyData[typeof key])}
+          placeholder={opts.placeholder}
+          step={opts.step}
         />
-        {errors[key] && <span style={{ fontSize: '0.72rem', color: '#dc2626' }}>{errors[key]}</span>}
+        {errors[key] && (
+          <span style={{ fontSize: '0.72rem', color: '#dc2626' }}>{errors[key]}</span>
+        )}
       </div>
     )
   }
@@ -86,7 +140,6 @@ export default function Onboarding({ initial, onComplete }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
-          {/* ── Dados da empresa ── */}
           <p className="ob-section-title">Dados da empresa</p>
           <div className="ob-grid">
             <div className="ob-field full">
@@ -98,7 +151,9 @@ export default function Onboarding({ initial, onComplete }: Props) {
                 value={form.companyName}
                 onChange={(e) => set('companyName', e.target.value)}
               />
-              {errors.companyName && <span style={{ fontSize: '0.72rem', color: 'var(--db-danger)' }}>{errors.companyName}</span>}
+              {errors.companyName && (
+                <span style={{ fontSize: '0.72rem', color: '#dc2626' }}>{errors.companyName}</span>
+              )}
             </div>
 
             <div className="ob-field">
@@ -114,19 +169,18 @@ export default function Onboarding({ initial, onComplete }: Props) {
               </select>
             </div>
 
-            {numField('revenue', 'Faturamento atual', { placeholder: '50000', hint: 'R$' })}
-            {numField('csat', 'CSAT atual', { min: 0, max: 5, step: 0.1, placeholder: '4.5', hint: '0,0 – 5,0' })}
-            {numField('mejEngagement', 'Engajamento MEJ atual', { min: 0, max: 100, step: 0.1, placeholder: '65', hint: '%' })}
-            {numField('collabRevenue', 'Faturamento collab atual', { placeholder: '10000', hint: 'R$' })}
+            {numField('revenue',       'Faturamento atual',        { placeholder: '50000',  hint: 'R$' })}
+            {numField('csat',          'CSAT atual',               { placeholder: '4.5',    hint: `0,0 – ${CSAT_MAX},0`, step: 0.1 })}
+            {numField('mejEngagement', 'Engajamento MEJ atual',    { placeholder: '65',     hint: '%',  step: 0.1 })}
+            {numField('collabRevenue', 'Faturamento collab atual', { placeholder: '10000',  hint: 'R$' })}
           </div>
 
-          {/* ── Metas ── */}
           <p className="ob-section-title">Metas</p>
           <div className="ob-grid">
-            {numField('targetRevenue', 'Meta de faturamento', { placeholder: '100000', hint: 'R$' })}
-            {numField('targetCsat', 'Meta de CSAT', { min: 0.1, max: 5, step: 0.1, placeholder: '5.0', hint: '0,1 – 5,0' })}
-            {numField('targetMejEngagement', 'Meta de engajamento MEJ', { min: 0, max: 100, step: 0.1, placeholder: '80', hint: '%' })}
-            {numField('targetCollabRevenue', 'Meta de faturamento collab', { placeholder: '25000', hint: 'R$' })}
+            {numField('targetRevenue',        'Meta de faturamento',        { placeholder: '100000', hint: 'R$' })}
+            {numField('targetCsat',           'Meta de CSAT',               { placeholder: '5.0',    hint: `0,1 – ${CSAT_MAX},0`, step: 0.1 })}
+            {numField('targetMejEngagement',  'Meta de engajamento MEJ',    { placeholder: '80',     hint: '%',  step: 0.1 })}
+            {numField('targetCollabRevenue',  'Meta de faturamento collab', { placeholder: '25000',  hint: 'R$' })}
           </div>
 
           <div className="ob-footer">
