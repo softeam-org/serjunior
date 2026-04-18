@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   CLUSTERS,
   calcIndex,
@@ -38,7 +38,7 @@ function indexToBarPct(index: number): number {
 }
 
 function Field({
-  label, value, onChange, prefix, suffix, step, min,
+  label, value, onChange, prefix, suffix,
 }: {
   label: string
   value: number
@@ -48,6 +48,29 @@ function Field({
   step?: number
   min?: number
 }) {
+  const [text, setText] = useState(() => (value === 0 ? '' : String(value)))
+
+  useEffect(() => {
+    const norm = text.replace(',', '.')
+    const parsed = parseFloat(norm)
+    const current = isNaN(parsed) ? 0 : parsed
+    if (current !== value) setText(value === 0 ? '' : String(value))
+  }, [value])
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let raw = e.target.value.replace(/[^\d,.]/, '').replace(/^0+(\d)/, '$1')
+    setText(raw)
+    const norm = raw.replace(',', '.')
+    const parsed = parseFloat(norm)
+    onChange(isNaN(parsed) ? 0 : parsed)
+  }
+
+  function handleBlur() {
+    const norm = text.replace(',', '.')
+    const parsed = parseFloat(norm)
+    setText(isNaN(parsed) || parsed === 0 ? '' : String(parsed))
+  }
+
   return (
     <div className="ob-field">
       <label className="ob-label">{label}</label>
@@ -59,14 +82,12 @@ function Field({
         )}
         <input
           className="ob-input"
-          type="number"
-          min={min ?? 0}
-          step={step ?? 1}
-          value={value}
-          onChange={(e) => {
-            const parsed = parseFloat(e.target.value)
-            onChange(isNaN(parsed) ? 0 : parsed)
-          }}
+          type="text"
+          inputMode="decimal"
+          placeholder="0"
+          value={text}
+          onChange={handleChange}
+          onBlur={handleBlur}
           style={{ flex: 1 }}
         />
         {suffix && (

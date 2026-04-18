@@ -42,7 +42,7 @@ function NumInput({
   const [text, setText] = useState(() => (numValue === 0 ? '' : String(numValue)))
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const raw = e.target.value
+    let raw = e.target.value.replace(/[^\d,.]/, '').replace(/^0+(\d)/, '$1')
     setText(raw)
     // Aceita vírgula como decimal (pt-BR)
     const norm = raw.replace(',', '.')
