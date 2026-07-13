@@ -5,12 +5,31 @@
 }
 
 :root {
-  --color-bg: #ffffff;
+  /* ─── Cores da federação ───────────────────────────────────────────────────
+     Troque os três hex abaixo pelos valores oficiais da SERJÚNIOR.
+     São as cores da bandeira do Brasil: verde, amarelo e azul.
+     Papéis na interface:
+       • verde  → cor primária (botões, links, elementos dominantes)
+       • azul   → apoio (títulos de seção, elementos secundários)
+       • amarelo→ destaque (detalhes, realces) — evite usar em texto sobre
+                  fundo claro, pois tem contraste baixo.                        */
+  --brand-green:  #009C3B; /* verde bandeira  — cor primária / ações */
+  --brand-yellow: #FFDF00; /* amarelo bandeira — destaque / realce   */
+  --brand-blue:   #002776; /* azul bandeira    — apoio / títulos     */
+
+  /* Variações derivadas (estados hover). Ajuste junto das cores acima. */
+  --brand-green-hover: #007e2f;
+  --brand-blue-hover:  #001a52;
+
+  /* ─── Papéis semânticos usados na UI ─────────────────────────────────────── */
+  --color-bg: #faf9f6;              /* off-white — fundo da página */
+  --color-surface: #ffffff;         /* fundo de cards e blocos     */
   --color-text: #1a1a2e;
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
+  --color-muted: #5b6472;
+  --color-border: #e6e3dc;
+  --color-primary: var(--brand-green);
+  --color-primary-hover: var(--brand-green-hover);
+
   --font-sans: system-ui, -apple-system, sans-serif;
   --font-mono: 'Fira Code', 'Cascadia Code', monospace;
 }

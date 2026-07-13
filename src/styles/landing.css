@@ -1,69 +1,245 @@
-/* ─── Landing Page ─────────────────────────────────────────────────────────── */
+/* ─── Landing Page — SERJÚNIOR ───────────────────────────────────────────────
+   As cores vêm das variáveis definidas em global.css:
+     --brand-green (primária), --brand-blue (apoio), --brand-yellow (destaque).
+   Troque os hex lá para aplicar as cores oficiais da federação.               */
 
 .landing {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--color-bg);
+  overflow-x: clip;
 }
 
-/* Nav */
+/* ─── Nav ──────────────────────────────────────────────────────────────────── */
 .landing-header {
   position: sticky;
   top: 0;
-  z-index: 10;
-  background: var(--color-bg);
+  z-index: 20;
+  background: rgba(250, 249, 246, 0.8);
+  backdrop-filter: saturate(180%) blur(10px);
   border-bottom: 1px solid var(--color-border);
 }
 
 .landing-nav {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0.9rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .landing-logo {
-  font-weight: 700;
-  font-size: 1.125rem;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 0.02em;
+  color: var(--brand-blue);
   margin-right: auto;
 }
 
+.landing-logo:hover {
+  text-decoration: none;
+}
+
+.landing-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
 .landing-nav-link {
+  position: relative;
   font-size: 0.9rem;
   color: var(--color-muted);
   font-weight: 500;
 }
 
+.landing-nav-link:not(.landing-nav-cta)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--brand-green);
+  transition: width 0.22s ease;
+}
+
+.landing-nav-link:not(.landing-nav-cta):hover::after {
+  width: 100%;
+}
+
 .landing-nav-link:hover {
-  color: var(--color-text);
+  color: var(--brand-blue);
   text-decoration: none;
 }
 
-/* Hero */
+.landing-nav-cta {
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.5rem;
+  background: var(--brand-blue);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
+}
+
+.landing-nav-cta:hover {
+  background: var(--brand-blue-hover);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--brand-blue) 70%, transparent);
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────────── */
 .landing-main {
   flex: 1;
 }
 
 .landing-hero {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 6rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+  min-height: min(88vh, 760px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem 6rem;
   text-align: center;
 }
 
+.landing-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 840px;
+  animation: hero-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Blobs animados de fundo (as 3 cores da bandeira) */
+.hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  z-index: 0;
+  will-change: transform;
+}
+
+.hero-blob-green {
+  width: 460px;
+  height: 460px;
+  background: var(--brand-green);
+  top: -120px;
+  left: -80px;
+  animation: blob-float-a 16s ease-in-out infinite;
+}
+
+.hero-blob-yellow {
+  width: 380px;
+  height: 380px;
+  background: var(--brand-yellow);
+  top: 40%;
+  right: -100px;
+  opacity: 0.45;
+  animation: blob-float-b 20s ease-in-out infinite;
+}
+
+.hero-blob-blue {
+  width: 420px;
+  height: 420px;
+  background: var(--brand-blue);
+  bottom: -140px;
+  left: 30%;
+  opacity: 0.35;
+  animation: blob-float-c 18s ease-in-out infinite;
+}
+
+@keyframes blob-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(60px, 40px) scale(1.1); }
+  66%      { transform: translate(-30px, 70px) scale(0.95); }
+}
+
+@keyframes blob-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-70px, -50px) scale(1.15); }
+}
+
+@keyframes blob-float-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(50px, -40px) scale(1.08); }
+  80%      { transform: translate(-40px, 20px) scale(0.92); }
+}
+
+/* Grade sutil sobreposta */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+.landing-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--brand-green-hover);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 4px 16px -8px color-mix(in srgb, var(--brand-green) 40%, transparent);
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-green);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-green) 60%, transparent);
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-green) 60%, transparent); }
+  70%  { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
 .landing-hero-title {
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(2.4rem, 6.5vw, 4.2rem);
   font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1.25rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--brand-blue);
+  margin-bottom: 1.4rem;
+}
+
+.landing-hero-gradient {
+  color: var(--brand-green);
 }
 
 .landing-hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   color: var(--color-muted);
-  margin-bottom: 2.5rem;
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
 }
 
 .landing-hero-actions {
@@ -73,59 +249,527 @@
   flex-wrap: wrap;
 }
 
-/* Buttons */
+/* Indicador de scroll */
+.hero-scroll {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  animation: bob 2.2s ease-in-out infinite;
+}
+
+.hero-scroll-mouse {
+  display: block;
+  width: 24px;
+  height: 38px;
+  border: 2px solid color-mix(in srgb, var(--brand-blue) 45%, transparent);
+  border-radius: 12px;
+  position: relative;
+}
+
+.hero-scroll-wheel {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 4px;
+  height: 7px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--brand-green);
+  animation: wheel 1.6s ease-in-out infinite;
+}
+
+@keyframes wheel {
+  0%   { opacity: 0; transform: translateY(0); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(12px); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 8px); }
+}
+
+/* ─── Buttons ──────────────────────────────────────────────────────────────── */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.75rem 1.75rem;
-  border-radius: 0.5rem;
+  padding: 0.85rem 1.9rem;
+  border-radius: 0.6rem;
   font-weight: 600;
-  font-size: 0.95rem;
-  transition: background 0.15s, color 0.15s;
+  font-size: 0.98rem;
+  transition: background 0.15s, color 0.15s, transform 0.12s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .btn:hover {
   text-decoration: none;
+  transform: translateY(-2px);
 }
 
 .btn-primary {
-  background: var(--color-primary);
+  background: var(--brand-green);
   color: #fff;
+  box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--brand-green) 80%, transparent);
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-hover);
+  background: var(--brand-green-hover);
+  color: #fff;
+  box-shadow: 0 12px 28px -10px color-mix(in srgb, var(--brand-green) 90%, transparent);
 }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--color-text);
+  background: var(--color-surface);
+  color: var(--brand-blue);
   border: 1px solid var(--color-border);
 }
 
 .btn-secondary:hover {
-  background: var(--color-border);
+  border-color: var(--brand-blue);
+  background: color-mix(in srgb, var(--brand-blue) 6%, var(--color-surface));
 }
 
-/* Generic section */
+/* ─── Reveal on scroll ─────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Sections genéricas ───────────────────────────────────────────────────── */
 .landing-section {
-  max-width: 900px;
+  max-width: 1140px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 5rem 1.5rem;
+  width: 100%;
 }
 
-.landing-section h2 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-/* Footer */
-.landing-footer {
-  border-top: 1px solid var(--color-border);
-  padding: 1.5rem 2rem;
+.landing-section-title {
+  font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--brand-blue);
   text-align: center;
-  font-size: 0.875rem;
+  margin-bottom: 0.9rem;
+}
+
+.landing-section-lead {
+  font-size: 1.1rem;
   color: var(--color-muted);
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 2.75rem;
+}
+
+/* ─── Sobre ────────────────────────────────────────────────────────────────── */
+.landing-about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.landing-about-card {
+  --accent: var(--brand-green);
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1.1rem;
+  padding: 2rem 1.9rem;
+  overflow: hidden;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s, border-color 0.22s;
+}
+
+.landing-about-card:nth-child(2) { --accent: var(--brand-yellow); }
+.landing-about-card:nth-child(3) { --accent: var(--brand-blue); }
+
+/* Brilho colorido que expande a partir do ícone no hover */
+.landing-about-card::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -30%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  filter: blur(60px);
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.landing-about-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--color-border));
+  box-shadow: 0 22px 46px -24px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.landing-about-card:hover::after {
+  opacity: 0.14;
+}
+
+.landing-about-icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  color: #fff;
+  border-radius: 0.9rem;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--brand-blue)));
+  box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--accent) 80%, transparent);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-about-card:hover .landing-about-icon {
+  transform: scale(1.1) rotate(-6deg);
+}
+
+/* Marca-d'água grande do mesmo ícone, no canto */
+.landing-about-glyph {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 128px;
+  height: 128px;
+  color: var(--accent);
+  opacity: 0.07;
+  transform: rotate(-10deg);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+
+.landing-about-card:hover .landing-about-glyph {
+  opacity: 0.14;
+  transform: rotate(0deg) scale(1.05);
+}
+
+.landing-about-card h3 {
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  margin-bottom: 0.6rem;
+}
+
+.landing-about-card p {
+  position: relative;
+  z-index: 1;
+  color: var(--color-muted);
+  font-size: 0.98rem;
+}
+
+/* ─── Números / Impacto ────────────────────────────────────────────────────── */
+.landing-impact {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--brand-green) 55%, var(--brand-blue)) 0%, transparent 55%),
+    radial-gradient(120% 140% at 100% 100%, color-mix(in srgb, var(--brand-blue) 60%, #000) 0%, transparent 55%),
+    var(--brand-blue);
+  color: #fff;
+}
+
+.landing-impact-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.landing-impact-value {
+  display: block;
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--brand-yellow);
+  line-height: 1;
+}
+
+.landing-impact-label {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ─── Portfólio das EJs ────────────────────────────────────────────────────── */
+.ej-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1.5rem;
+}
+
+.ej-card-wrap {
+  display: flex;
+}
+
+.ej-card {
+  --accent: var(--brand-green);
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1.2rem;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.22s, transform 0.18s;
+}
+
+.ej-card-wrap:nth-child(3n+2) .ej-card { --accent: var(--brand-yellow); }
+.ej-card-wrap:nth-child(3n) .ej-card { --accent: var(--brand-blue); }
+
+.ej-card:hover {
+  text-decoration: none;
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--color-border));
+  box-shadow: 0 24px 48px -22px color-mix(in srgb, var(--brand-blue) 55%, transparent);
+}
+
+/* Banner colorido no topo */
+.ej-card-banner {
+  height: 78px;
+  background:
+    radial-gradient(120% 160% at 15% 0%, color-mix(in srgb, #fff 22%, transparent) 0%, transparent 45%),
+    linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 45%, var(--brand-blue)));
+  transition: height 0.22s ease;
+}
+
+.ej-card:hover .ej-card-banner {
+  height: 88px;
+}
+
+.ej-card-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 1.5rem 1.6rem;
+  margin-top: -34px;
+}
+
+.ej-card-logo {
+  width: 68px;
+  height: 68px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 4px solid var(--color-surface);
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--brand-blue) 60%, transparent);
+  margin-bottom: 0.9rem;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ej-card:hover .ej-card-logo {
+  transform: scale(1.06) translateY(-2px);
+}
+
+.ej-card-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0.7rem;
+}
+
+.ej-card-initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.7rem;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--brand-blue)));
+}
+
+.ej-card-name {
+  font-weight: 700;
+  color: var(--brand-blue);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.ej-card-city {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin-top: 0.3rem;
+}
+
+.ej-card-pin {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.ej-card-services {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  line-height: 1.55;
+  margin: 0.9rem 0 1.2rem;
+}
+
+.ej-card-visit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  filter: brightness(0.85);
+}
+
+.ej-card-arrow {
+  transition: transform 0.2s;
+}
+
+.ej-card:hover .ej-card-arrow {
+  transform: translate(3px, -3px);
+}
+
+/* ─── Contato ──────────────────────────────────────────────────────────────── */
+.landing-contact {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(80% 120% at 50% 0%, color-mix(in srgb, var(--brand-green) 12%, transparent) 0%, transparent 60%),
+    var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.landing-contact-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  text-align: center;
+}
+
+.landing-contact-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.landing-social {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.landing-social a {
+  position: relative;
+  color: var(--brand-blue);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.landing-social a:hover {
+  color: var(--brand-green);
+  text-decoration: none;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────────────────── */
+.landing-footer {
+  background: var(--brand-blue);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.landing-footer-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 2.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.landing-footer-brand {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.landing-footer-links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.landing-footer-links a {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+}
+
+.landing-footer-links a:hover {
+  color: var(--brand-yellow);
+  text-decoration: none;
+}
+
+.landing-footer-copy {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ─── Responsivo ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .landing-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .landing-nav-links {
+    gap: 0.9rem;
+  }
+
+  .hero-scroll {
+    display: none;
+  }
+}
+
+/* ─── Acessibilidade: respeita quem prefere menos movimento ────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob,
+  .badge-dot,
+  .landing-hero-gradient,
+  .hero-scroll,
+  .hero-scroll-wheel,
+  .landing-hero-content {
+    animation: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
