@@ -33,59 +33,15 @@ export interface EJ {
  */
 export const EJS: EJ[] = [
   {
-    id: 'ej-exemplo-1',
-    name: 'EJ Exemplo Um',
-    city: 'Aracaju — UFS',
-    website: 'https://exemplo1.com.br',
+    id: 'softeam',
+    name: 'Softeam',
+    city: 'Aracaju - UFS',
+    website: 'https://softeam.com.br',
     services: 'Websites, sistemas e manutenção de software.',
-    // logo: '/logos/ej-exemplo-1.png',
-  },
-  {
-    id: 'ej-exemplo-2',
-    name: 'EJ Exemplo Dois',
-    city: 'São Cristóvão — UFS',
-    website: 'https://exemplo2.com.br',
-    services: 'Consultoria em engenharia e projetos estruturais.',
-    // logo: '/logos/ej-exemplo-2.png',
-  },
-  {
-    id: 'ej-exemplo-3',
-    name: 'EJ Exemplo Três',
-    city: 'Aracaju — Unit',
-    website: 'https://exemplo3.com.br',
-    services: 'Identidade visual, design gráfico e social media.',
-    // logo: '/logos/ej-exemplo-3.png',
-  },
-  {
-    id: 'ej-exemplo-4',
-    name: 'EJ Exemplo Quatro',
-    city: 'Lagarto — UFS',
-    website: 'https://exemplo4.com.br',
-    services: 'Planejamento financeiro e consultoria empresarial.',
-    // logo: '/logos/ej-exemplo-4.png',
-  },
-  {
-    id: 'ej-exemplo-5',
-    name: 'EJ Exemplo Cinco',
-    city: 'Itabaiana — UFS',
-    website: 'https://exemplo5.com.br',
-    services: 'Marketing digital, tráfego pago e branding.',
-    // logo: '/logos/ej-exemplo-5.png',
-  },
-  {
-    id: 'ej-exemplo-6',
-    name: 'EJ Exemplo Seis',
-    city: 'Aracaju — IFS',
-    website: 'https://exemplo6.com.br',
-    services: 'Automação, eletrônica e soluções de IoT.',
-    // logo: '/logos/ej-exemplo-6.png',
-  },
+    logo: '/logos/softeam.png',
+  }
 ]
 
-/**
- * ⚠️ DADOS PLACEHOLDER — números de impacto exibidos na landing page.
- * Ajuste os valores reais da federação aqui.
- */
 export const IMPACTO: { value: string; label: string }[] = [
   { value: '+15', label: 'Empresas Juniores' },
   { value: '+500', label: 'Empreendedores' },

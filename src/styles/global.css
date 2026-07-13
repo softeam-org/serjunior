@@ -13,9 +13,9 @@
        • azul   → apoio (títulos de seção, elementos secundários)
        • amarelo→ destaque (detalhes, realces) — evite usar em texto sobre
                   fundo claro, pois tem contraste baixo.                        */
-  --brand-green:  #009C3B; /* verde bandeira  — cor primária / ações */
-  --brand-yellow: #FFDF00; /* amarelo bandeira — destaque / realce   */
-  --brand-blue:   #002776; /* azul bandeira    — apoio / títulos     */
+  --brand-green:  #36ad4f; /* verde bandeira  — cor primária / ações */
+  --brand-yellow: #e4c736; /* amarelo bandeira — destaque / realce   */
+  --brand-blue:   #094767; /* azul bandeira    — apoio / títulos     */
 
   /* Variações derivadas (estados hover). Ajuste junto das cores acima. */
   --brand-green-hover: #007e2f;

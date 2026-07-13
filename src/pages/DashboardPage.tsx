@@ -1,6 +1,17 @@
 import { useState } from 'react'
-import { loadData, saveData, calcIndex, getCollabPct, getClusterById, fmtIndex, BRL } from '../utils/cluster'
+import {
+  loadData,
+  saveData,
+  calcIndex,
+  getCollabPct,
+  getClusterById,
+  getClusterIndex,
+  fmtIndex,
+  BRL,
+  CLUSTERS,
+} from '../utils/cluster'
 import type { CompanyData } from '../utils/cluster'
+import { IconTrendingUp, IconAlertTriangle } from '../components/icons'
 import Onboarding from '../components/Onboarding'
 import Tab1Situacao from '../components/Tab1Situacao'
 import Tab2Gaps from '../components/Tab2Gaps'
@@ -33,6 +44,23 @@ export default function DashboardPage() {
   const collabPct = getCollabPct(data.collabRevenue, data.revenue)
   const index = calcIndex(data.revenue, data.csat, data.mejEngagement, collabPct)
 
+  const currentClObj = getClusterById(data.currentCluster)
+  const currentClIdx = getClusterIndex(data.currentCluster)
+  const nextCluster = CLUSTERS[currentClIdx + 1] ?? null
+  const prevCluster = CLUSTERS[currentClIdx - 1] ?? null
+  const isTopCluster = nextCluster === null
+
+  // Risco de queda: o índice atual está abaixo do piso do cluster onde a EJ
+  // está hoje — na próxima avaliação ela cairia. Nesse caso a faixa mostra o
+  // progresso necessário para PERMANECER no cluster, não para subir.
+  const atRisk = data.csat !== 0 && index < currentClObj.min && prevCluster !== null
+
+  const stripPct = atRisk
+    ? Math.min((index / currentClObj.min) * 100, 100)
+    : isTopCluster
+      ? 100
+      : Math.min((index / nextCluster.min) * 100, 100)
+
   return (
     <div className="db-layout">
       <header className="db-topbar">
@@ -50,7 +78,7 @@ export default function DashboardPage() {
               {fmtIndex(index)}
             </strong>
           </span>
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
+          <span className="db-topbar-rev" style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
             {BRL.format(data.revenue)}
           </span>
           <button
@@ -62,6 +90,54 @@ export default function DashboardPage() {
           </button>
         </div>
       </header>
+
+      {/* Faixa de progresso: subir de cluster ou risco de queda */}
+      <div className={`db-cluster-strip${atRisk ? ' at-risk' : ''}`}>
+        {/* Badge à esquerda: de onde partimos (ou para onde cairíamos) */}
+        {atRisk && prevCluster ? (
+          <span className={`cluster-badge ${prevCluster.id}`}>{prevCluster.label}</span>
+        ) : (
+          <span className={`cluster-badge ${data.currentCluster}`}>{currentClObj.label}</span>
+        )}
+
+        <div className="db-cluster-strip-bar">
+          <div className="db-cluster-strip-track">
+            <div
+              className="db-cluster-strip-fill"
+              style={{
+                width: `${stripPct}%`,
+                background: atRisk ? '#dc2626' : currentClObj.color,
+              }}
+            />
+          </div>
+          <div className="db-cluster-strip-caption">
+            {data.csat === 0 ? (
+              <>Índice anulado por CSAT zerado — registre o CSAT para medir o avanço</>
+            ) : atRisk ? (
+              <>
+                <IconAlertTriangle width={13} height={13} /> {stripPct.toFixed(0)}% do piso — abaixo disso a EJ
+                cai para o {prevCluster!.label}
+              </>
+            ) : isTopCluster ? (
+              <>
+                <IconTrendingUp width={13} height={13} /> Cluster máximo atingido
+              </>
+            ) : (
+              <>
+                <IconTrendingUp width={13} height={13} /> {stripPct.toFixed(0)}% rumo ao {nextCluster.label}
+                {stripPct >= 100 && ' — piso já alcançado!'}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Badge à direita: para onde subimos, ou o cluster que estamos segurando */}
+        {atRisk ? (
+          <span className={`cluster-badge ${data.currentCluster} db-cluster-strip-next`}>{currentClObj.label}</span>
+        ) : !isTopCluster ? (
+          <span className={`cluster-badge ${nextCluster.id} db-cluster-strip-next`}>{nextCluster.label}</span>
+        ) : null}
+      </div>
 
       <nav className="db-tabs">
         {TABS.map((tab) => (
