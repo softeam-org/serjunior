@@ -121,7 +121,7 @@ function EJCard({ ej }: { ej: EJ }) {
       <div className="ej-card-body">
         <div className="ej-card-logo">
           {ej.logo ? (
-            <img src={ej.logo} alt={`Logo da ${ej.name}`} />
+            <img src={`${import.meta.env.BASE_URL}${ej.logo.replace(/^\//, '')}`} alt={`Logo da ${ej.name}`} />
           ) : (
             <span className="ej-card-initials">{initials(ej.name)}</span>
           )}
