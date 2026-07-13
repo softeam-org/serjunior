@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import WikiSidebar from './WikiSidebar'
 import { loadWikiPage } from './useSidebar'
+import SiteHeader from '../components/SiteHeader'
 import '../styles/wiki.css'
 
 export default function WikiPage() {
@@ -13,22 +14,25 @@ export default function WikiPage() {
   const content = loadWikiPage(slug)
 
   return (
-    <div className="wiki-layout">
-      <WikiSidebar />
-      <main className="wiki-content">
-        {content === null ? (
-          <div className="wiki-not-found">
-            <h1>Page not found</h1>
-            <p>No wiki page exists at <code>{slug}</code>.</p>
-          </div>
-        ) : (
-          <article className="wiki-article">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-              {content}
-            </ReactMarkdown>
-          </article>
-        )}
-      </main>
-    </div>
+    <>
+      <SiteHeader />
+      <div className="wiki-layout">
+        <WikiSidebar />
+        <main className="wiki-content">
+          {content === null ? (
+            <div className="wiki-not-found">
+              <h1>Page not found</h1>
+              <p>No wiki page exists at <code>{slug}</code>.</p>
+            </div>
+          ) : (
+            <article className="wiki-article">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                {content}
+              </ReactMarkdown>
+            </article>
+          )}
+        </main>
+      </div>
+    </>
   )
 }

@@ -32,6 +32,12 @@
 
   --font-sans: system-ui, -apple-system, sans-serif;
   --font-mono: 'Fira Code', 'Cascadia Code', monospace;
+
+  --site-header-h: 4rem; /* altura do topbar global (SiteHeader) */
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -39,6 +45,20 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
+}
+
+/* Compensa o topbar fixo/sticky ao rolar até âncoras (#sobre, #ejs, #contato, etc.) */
+[id] {
+  scroll-margin-top: var(--site-header-h);
+}
+
+/* Grade quadriculada sutil — mesmo padrão da hero da landing page (.hero-grid) */
+.bg-grid {
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
 }
 
 a {

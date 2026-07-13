@@ -13,6 +13,7 @@ import {
 import type { CompanyData } from '../utils/cluster'
 import { IconTrendingUp, IconAlertTriangle } from '../components/icons'
 import Onboarding from '../components/Onboarding'
+import SiteHeader from '../components/SiteHeader'
 import Tab1Situacao from '../components/Tab1Situacao'
 import Tab2Gaps from '../components/Tab2Gaps'
 import Tab3Cenarios from '../components/Tab3Cenarios'
@@ -38,7 +39,12 @@ export default function DashboardPage() {
   }
 
   if (!data || editing) {
-    return <Onboarding initial={data} onComplete={handleComplete} />
+    return (
+      <>
+        <SiteHeader />
+        <Onboarding initial={data} onComplete={handleComplete} />
+      </>
+    )
   }
 
   const collabPct = getCollabPct(data.collabRevenue, data.revenue)
@@ -62,7 +68,9 @@ export default function DashboardPage() {
       : Math.min((index / nextCluster.min) * 100, 100)
 
   return (
-    <div className="db-layout">
+    <>
+      <SiteHeader />
+      <div className="db-layout">
       <header className="db-topbar">
         <div className="db-topbar-left">
           <span className="db-brand">SerJunior</span>
@@ -157,6 +165,7 @@ export default function DashboardPage() {
         {activeTab === 3 && <Tab3Cenarios data={data} />}
         {activeTab === 4 && <Tab4Simulador data={data} />}
       </div>
-    </div>
+      </div>
+    </>
   )
 }

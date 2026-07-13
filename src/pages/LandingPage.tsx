@@ -8,6 +8,7 @@ import {
   IconRocket,
   IconTarget,
 } from '../components/icons'
+import SiteHeader from '../components/SiteHeader'
 import '../styles/landing.css'
 
 /* ─── Hooks de animação ──────────────────────────────────────────────────────── */
@@ -145,20 +146,7 @@ function EJCard({ ej }: { ej: EJ }) {
 export default function LandingPage() {
   return (
     <div className="landing">
-      <header className="landing-header">
-        <nav className="landing-nav">
-          <a href="#top" className="landing-logo">SERJÚNIOR</a>
-          <div className="landing-nav-links">
-            <a href="#sobre" className="landing-nav-link">Sobre</a>
-            <a href="#ejs" className="landing-nav-link">EJs</a>
-            <a href="#contato" className="landing-nav-link">Contato</a>
-            <Link to="/wiki" className="landing-nav-link">Wiki</Link>
-            <Link to="/dashboard" className="landing-nav-link landing-nav-cta">
-              Dashboard de Cluster
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main className="landing-main" id="top">
         {/* ─── Hero ─────────────────────────────────────────────────────── */}
@@ -169,10 +157,6 @@ export default function LandingPage() {
           <div className="hero-grid" aria-hidden="true" />
 
           <div className="landing-hero-content">
-            <span className="landing-hero-badge">
-              <span className="badge-dot" />
-              Federação Sergipana de Empresas Juniores
-            </span>
             <h1 className="landing-hero-title">
               Fortalecendo o movimento{' '}
               <span className="landing-hero-gradient">empresa júnior</span> em Sergipe

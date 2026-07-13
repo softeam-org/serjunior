@@ -15,7 +15,8 @@
 .landing-header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 30;
+  min-height: var(--site-header-h);
   background: rgba(250, 249, 246, 0.8);
   backdrop-filter: saturate(180%) blur(10px);
   border-bottom: 1px solid var(--color-border);

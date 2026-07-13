@@ -23,8 +23,12 @@
 
 /* ── Onboarding ── */
 .ob-wrap {
-  min-height: 100vh;
-  background: var(--color-bg);
+  min-height: calc(100vh - var(--site-header-h));
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -406,7 +410,11 @@
 /* ── Dashboard Layout ── */
 .db-layout {
   min-height: 100vh;
-  background: #f9fafb;
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
   color: var(--color-text);
   display: flex;
   flex-direction: column;
@@ -414,8 +422,8 @@
 
 .db-topbar {
   position: sticky;
-  top: 0;
-  z-index: 50;
+  top: var(--site-header-h);
+  z-index: 25;
   background: #fff;
   border-bottom: 1px solid var(--color-border);
   padding: 0.85rem 1.5rem;

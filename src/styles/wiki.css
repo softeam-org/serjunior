@@ -12,6 +12,11 @@
 .wiki-layout {
   display: flex;
   min-height: 100vh;
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-blue) 6%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
 }
 
 /* ─── Sidebar ──────────────────────────────────────────────────────────────── */
@@ -23,8 +28,8 @@
   border-right: 1px solid var(--wiki-sidebar-border);
   padding: 2rem 1rem;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: var(--site-header-h);
+  height: calc(100vh - var(--site-header-h));
   overflow-y: auto;
 }
 
