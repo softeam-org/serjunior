@@ -7,6 +7,7 @@ import {
   getClusterById,
   getClusterIndex,
   getCollabPct,
+  getFloorValues,
   minRevenueForThreshold,
   BRL,
   fmtIndex,
@@ -33,81 +34,47 @@ interface MinItem {
 function calcMins(data: CompanyData, targetIndex: number): MinItem[] {
   const { revenue, csat, mejEngagement, collabRevenue } = data
   const collabPct = getCollabPct(collabRevenue, revenue)
-
-  // índice atual
   const currentIndex = calcIndex(revenue, csat, mejEngagement, collabPct)
-
-  // helper: índice = csat*(1+mej/100)*100*(rev+collab)
-  // => denominador comum para rev e collab
-  const baseMultiplier = (c: number, m: number) => c * (1 + m / 100) * 100
-
-  // ── Faturamento mínimo (mantendo csat, mej, collabRev atuais)
-  const revDenominator = baseMultiplier(csat, mejEngagement)
-  const minRev = revDenominator > 0
-    ? Math.max(0, targetIndex / revDenominator - collabRevenue)
-    : null
-  const revImpossible = revDenominator === 0
-
-  // ── CSAT mínimo (mantendo rev, mej, collabRev atuais)
-  const csatDenominator = (revenue + collabRevenue) * (1 + mejEngagement / 100) * 100
-  const minCsat = csatDenominator > 0
-    ? Math.min(5, targetIndex / csatDenominator)
-    : null
-  const csatImpossible = csatDenominator === 0 || (minCsat !== null && minCsat > 5)
-
-  // ── MEJ mínimo (mantendo rev, csat, collabRev atuais)
-  const mejDenominator = csat * (revenue + collabRevenue) * 100
-  const minMej = mejDenominator > 0
-    ? Math.min(100, (targetIndex / mejDenominator - 1) * 100)
-    : null
-  const mejImpossible = mejDenominator === 0 || (minMej !== null && minMej > 100)
-
-  // ── Collab mínimo em R$ (mantendo rev, csat, mej atuais)
-  const collabDenominator = baseMultiplier(csat, mejEngagement)
-  const minCollab = collabDenominator > 0
-    ? Math.max(0, targetIndex / collabDenominator - revenue)
-    : null
-  const collabImpossible = collabDenominator === 0 || (minCollab !== null && minCollab > revenue)
-
-  // se já atinge sem essa variável, minNeeded = null
   const alreadyOk = currentIndex >= targetIndex
+
+  const floors = getFloorValues(data, targetIndex)
 
   return [
     {
       label: 'Faturamento',
       color: '#3b82f6',
       currentDisplay: BRL.format(revenue),
-      minNeeded: (alreadyOk || revImpossible) ? null : minRev,
-      minDisplay: revImpossible ? 'Impossível' : BRL.format(minRev ?? 0),
+      minNeeded: (alreadyOk || floors.minRevenue === null) ? null : floors.minRevenue,
+      minDisplay: floors.minRevenue === null ? 'Impossível' : BRL.format(floors.minRevenue),
       unit: 'brl',
-      impossible: revImpossible,
+      impossible: floors.minRevenue === null,
     },
     {
       label: 'CSAT',
       color: '#10b981',
       currentDisplay: csat.toFixed(1),
-      minNeeded: (alreadyOk || csatImpossible) ? null : minCsat,
-      minDisplay: csatImpossible ? 'Impossível (máx 5,0)' : (minCsat ?? 0).toFixed(2),
+      minNeeded: (alreadyOk || floors.minCsat === null) ? null : floors.minCsat,
+      minDisplay: floors.minCsat === null ? 'Impossível (máx 5,0)' : floors.minCsat.toFixed(2),
       unit: 'csat',
-      impossible: csatImpossible,
+      impossible: floors.minCsat === null,
     },
     {
       label: 'Engajamento MEJ',
       color: '#f59e0b',
       currentDisplay: fmtPct(mejEngagement),
-      minNeeded: (alreadyOk || mejImpossible) ? null : minMej,
-      minDisplay: mejImpossible ? 'Impossível (máx 100%)' : fmtPct(minMej ?? 0),
+      minNeeded: (alreadyOk || floors.minMejEngagement === null) ? null : floors.minMejEngagement,
+      minDisplay: floors.minMejEngagement === null ? 'Impossível (máx 100%)' : fmtPct(floors.minMejEngagement),
       unit: 'pct',
-      impossible: mejImpossible,
+      impossible: floors.minMejEngagement === null,
     },
     {
       label: 'Faturamento collab',
       color: 'var(--c5)',
       currentDisplay: BRL.format(collabRevenue),
-      minNeeded: (alreadyOk || collabImpossible) ? null : minCollab,
-      minDisplay: collabImpossible ? 'Impossível' : BRL.format(minCollab ?? 0),
+      minNeeded: (alreadyOk || floors.minCollabRevenue === null) ? null : floors.minCollabRevenue,
+      minDisplay: floors.minCollabRevenue === null ? 'Impossível' : BRL.format(floors.minCollabRevenue),
       unit: 'brl',
-      impossible: collabImpossible,
+      impossible: floors.minCollabRevenue === null,
     },
   ]
 }

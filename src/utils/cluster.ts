@@ -108,6 +108,66 @@ export function minRevenueForThreshold(
   return Math.max(0, threshold / divisor - collabRev)
 }
 
+export interface FloorValues {
+  minRevenue: number | null
+  minCsat: number | null
+  minMejEngagement: number | null
+  minCollabRevenue: number | null
+}
+
+/**
+ * Valor mínimo que cada variável isoladamente poderia ter — mantendo as outras
+ * três no valor atual — para que o índice ainda atinja `targetIndex`.
+ * `null` significa que nenhum valor dentro dos limites da variável alcançaria
+ * o alvo sozinho (ex.: precisaria de CSAT > 5 ou engajamento > 100%).
+ */
+export function getFloorValues(data: CompanyData, targetIndex: number): FloorValues {
+  const { revenue, csat, mejEngagement, collabRevenue } = data
+  const baseMultiplier = (c: number, m: number) => c * (1 + m / 100) * 100
+
+  const revDenominator = baseMultiplier(csat, mejEngagement)
+  const minRevenue = revDenominator > 0 ? Math.max(0, targetIndex / revDenominator - collabRevenue) : null
+
+  const csatDenominator = (revenue + collabRevenue) * (1 + mejEngagement / 100) * 100
+  const rawMinCsat = csatDenominator > 0 ? targetIndex / csatDenominator : null
+  const minCsat = rawMinCsat !== null && rawMinCsat <= CSAT_MAX ? Math.max(CSAT_MIN, rawMinCsat) : null
+
+  const mejDenominator = csat * (revenue + collabRevenue) * 100
+  const rawMinMej = mejDenominator > 0 ? (targetIndex / mejDenominator - 1) * 100 : null
+  const minMejEngagement = rawMinMej !== null && rawMinMej <= 100 ? Math.max(0, rawMinMej) : null
+
+  const collabDenominator = baseMultiplier(csat, mejEngagement)
+  const rawMinCollab = collabDenominator > 0 ? targetIndex / collabDenominator - revenue : null
+  const minCollabRevenue = rawMinCollab !== null && rawMinCollab <= revenue ? Math.max(0, rawMinCollab) : null
+
+  return { minRevenue, minCsat, minMejEngagement, minCollabRevenue }
+}
+
+export interface CsatSafetyMargin {
+  current: number
+  /** Menor CSAT que ainda mantém o cluster atual, com faturamento/engajamento/collab no valor de hoje. `null` = nenhum CSAT dentro de [0,5] sustentaria o cluster. */
+  floor: number | null
+  /** current - floor. Negativo = o CSAT de hoje já está abaixo do piso. */
+  buffer: number | null
+  bufferPct: number | null
+}
+
+/**
+ * Margem de segurança do CSAT: é o único indicador que pode efetivamente cair
+ * de uma avaliação para a outra (é uma média de satisfação, não um acumulado
+ * como faturamento, faturamento collab ou engajamento MEJ, que só tendem a
+ * subir ao longo do ciclo). Calcula quanto o CSAT pode cair — mantendo os
+ * demais indicadores no valor atual — antes da empresa cair para o cluster
+ * abaixo. `floorIndex` normalmente é o piso do cluster atual (`currentCluster.min`).
+ */
+export function getCsatSafetyMargin(data: CompanyData, floorIndex: number): CsatSafetyMargin {
+  const { minCsat } = getFloorValues(data, floorIndex)
+  if (minCsat === null) return { current: data.csat, floor: null, buffer: null, bufferPct: null }
+  const buffer = data.csat - minCsat
+  const bufferPct = data.csat > 0 ? (buffer / data.csat) * 100 : 0
+  return { current: data.csat, floor: minCsat, buffer, bufferPct }
+}
+
 export const BRL = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',

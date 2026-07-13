@@ -35,11 +35,43 @@ export const EJS: EJ[] = [
   {
     id: 'softeam',
     name: 'Softeam',
-    city: 'Aracaju - UFS',
+    city: 'São Cristóvão - UFS',
     website: 'https://softeam.com.br',
     services: 'Websites, sistemas e manutenção de software.',
     logo: '/logos/softeam.png',
-  }
+  },
+  {
+    id: 'eja',
+    name: 'EJAUFS Consultoria',
+    city: 'São Cristovão - UFS',
+    website: 'https://softeam.com.br',
+    services: 'Gestao Empresarial',
+    logo: '/logos/eja.png',
+  },
+  {
+    id: 'easy',
+    name: 'Easy Jr Soluções Ambientais',
+    city: 'São Cristovão - UFS',
+    website: 'https://easyjr.com.br/',
+    services: 'Consultoria Ambiental',
+    logo: '/logos/easy.png',
+  },
+  {
+    id: 'epjel',
+    name: 'EPJEL Engenharia',
+    city: 'São Cristovão - UFS',
+    website: 'https://softeam.com.br',
+    services: '...',
+    logo: '/logos/epjel.png',
+  },
+  {
+    id: 'edificarse',
+    name: 'EdificarSe Arquitetura e Engenharia',
+    city: 'São Cristovão - UFS',
+    website: 'https://edificarse.com.br/',
+    services: 'Arquitetura, Engenharia Civil.',
+    logo: '/logos/edificarse.png',
+  },
 ]
 
 export const IMPACTO: { value: string; label: string }[] = [

@@ -682,6 +682,48 @@
   max-width: 100%;
 }
 
+/* ── Safety Margin ── */
+.db-margin-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.db-margin-row:last-child { border-bottom: none; }
+
+.db-margin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.db-margin-label { font-size: 0.82rem; font-weight: 600; color: var(--color-text); }
+
+.db-margin-track {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  background: #f1f5f9;
+}
+
+.db-margin-risk {
+  height: 100%;
+  background: repeating-linear-gradient(45deg, #fecaca, #fecaca 4px, #fca5a5 4px, #fca5a5 8px);
+}
+
+.db-margin-safe {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.db-margin-caption {
+  font-size: 0.72rem;
+  margin-top: 0.35rem;
+}
+
 /* ── CSAT Alert ── */
 .db-alert-csat {
   background: #fef2f2;

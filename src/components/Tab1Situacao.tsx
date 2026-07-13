@@ -3,6 +3,7 @@ import {
   calcIndex,
   getClusterById,
   getCollabPct,
+  getCsatSafetyMargin,
   BRL,
   fmtIndex,
   fmtPct,
@@ -31,6 +32,50 @@ function ProgressBar({
       </div>
       <div className="db-prog-track">
         <div className="db-prog-fill" style={{ width: `${pct}%`, background: color }} />
+      </div>
+    </div>
+  )
+}
+
+function CsatMarginRow({ current, floor, buffer, bufferPct }: {
+  current: number; floor: number | null; buffer: number | null; bufferPct: number | null
+}) {
+  if (floor === null) {
+    return (
+      <div className="db-margin-row">
+        <div className="db-margin-head">
+          <span className="db-margin-label">CSAT</span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-muted)' }}>
+            Nenhuma nota de CSAT sustentaria o cluster atual com o restante nos valores de hoje
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  const belowFloor = buffer !== null && buffer < 0
+  const floorPct = Math.min(100, Math.max(0, (floor / Math.max(current, 1e-9)) * 100))
+
+  return (
+    <div className="db-margin-row">
+      <div className="db-margin-head">
+        <span className="db-margin-label">CSAT</span>
+        <span style={{ fontSize: '0.72rem', color: 'var(--color-muted)' }}>
+          Atual: <strong style={{ color: 'var(--color-text)' }}>{current.toFixed(2)}</strong>
+          {'  ·  '}
+          Piso: <strong style={{ color: 'var(--color-text)' }}>{floor.toFixed(2)}</strong>
+        </span>
+      </div>
+      <div className="db-margin-track">
+        <div className="db-margin-risk" style={{ width: `${belowFloor ? 100 : floorPct}%` }} />
+        {!belowFloor && (
+          <div className="db-margin-safe" style={{ width: `${100 - floorPct}%`, background: '#10b981' }} />
+        )}
+      </div>
+      <div className="db-margin-caption" style={{ color: belowFloor ? '#dc2626' : 'var(--color-muted)' }}>
+        {belowFloor
+          ? `O CSAT de hoje já está ${Math.abs(buffer!).toFixed(2)} abaixo do piso — mantendo faturamento, engajamento e collab como estão, isso já derruba o cluster`
+          : `O CSAT pode cair ${buffer!.toFixed(2)} (${fmtPct(bufferPct!)}) antes de colocar o cluster em risco`}
       </div>
     </div>
   )
@@ -153,6 +198,21 @@ export default function Tab1Situacao({ data }: Props) {
           color="var(--c5)"
         />
       </div>
+
+      {data.csat === 0 ? null : (
+        <>
+          <p className="db-section-title">Margem de segurança do CSAT</p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: '0.85rem' }}>
+            O CSAT é o único indicador que pode cair de uma avaliação para a outra — faturamento,
+            faturamento collab e engajamento MEJ só tendem a subir ao longo do ciclo. Veja quanto o
+            CSAT pode cair, mantendo os demais indicadores como estão hoje, antes de a empresa cair
+            para o cluster abaixo ({currentCluster.label}).
+          </p>
+          <div className="db-card" style={{ marginBottom: '1.25rem' }}>
+            <CsatMarginRow {...getCsatSafetyMargin(data, currentCluster.min)} />
+          </div>
+        </>
+      )}
 
       <p className="db-section-title">Ranking de clusters</p>
       <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: '0.85rem' }}>
