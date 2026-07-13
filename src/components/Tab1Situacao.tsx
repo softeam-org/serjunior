@@ -4,10 +4,12 @@ import {
   getClusterById,
   getCollabPct,
   getCsatSafetyMargin,
+  getYearPacing,
   BRL,
   fmtIndex,
   fmtPct,
   type CompanyData,
+  type PacingStatus,
 } from '../utils/cluster'
 
 interface Props { data: CompanyData }
@@ -78,6 +80,92 @@ function CsatMarginRow({ current, floor, buffer, bufferPct }: {
           : `O CSAT pode cair ${buffer!.toFixed(2)} (${fmtPct(bufferPct!)}) antes de colocar o cluster em risco`}
       </div>
     </div>
+  )
+}
+
+const PACING_STATUS_LABEL: Record<PacingStatus, string> = {
+  ahead: 'Adiantado',
+  onTrack: 'No ritmo',
+  behind: 'Atrasado',
+}
+
+const PACING_STATUS_COLOR: Record<PacingStatus, string> = {
+  ahead: '#15803d',
+  onTrack: '#2563eb',
+  behind: '#dc2626',
+}
+
+function PacingBar({
+  label, pct, fracElapsed, displayCurrent, displayTarget, color,
+}: {
+  label: string; pct: number; fracElapsed: number
+  displayCurrent: string; displayTarget: string; color: string
+}) {
+  return (
+    <div className="db-prog-wrap">
+      <div className="db-prog-header">
+        <span className="db-prog-label">{label}</span>
+        <span className="db-prog-values">{displayCurrent} / {displayTarget}</span>
+        <span className="db-prog-pct">{fmtPct(pct)}</span>
+      </div>
+      <div className="db-pacing-track">
+        {[25, 50, 75].map((q) => (
+          <div key={q} className="db-pacing-grid" style={{ left: `${q}%` }} />
+        ))}
+        <div className="db-pacing-fill" style={{ width: `${Math.min(pct, 100)}%`, background: color }} />
+        <div className="db-pacing-today" style={{ left: `${fracElapsed * 100}%` }} title="Hoje" />
+      </div>
+    </div>
+  )
+}
+
+function YearPacingCard({ data }: Props) {
+  const pacing = getYearPacing(data)
+
+  return (
+    <>
+      <p className="db-section-title">Ritmo até a avaliação de fim de ano</p>
+      <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginBottom: '0.85rem' }}>
+        Compara o quanto do ano civil já passou com o quanto das metas cumulativas de faturamento
+        você já atingiu. A avaliação acontece em 31/12 — faltam {pacing.daysRemaining} dias.
+      </p>
+      <div className="db-card" style={{ marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
+            {fmtPct(pacing.fracElapsed * 100)} do ano decorrido
+          </span>
+          <span
+            style={{
+              fontSize: '0.75rem', fontWeight: 700, padding: '0.25rem 0.7rem', borderRadius: '999px',
+              color: PACING_STATUS_COLOR[pacing.status],
+              background: `${PACING_STATUS_COLOR[pacing.status]}15`,
+              border: `1px solid ${PACING_STATUS_COLOR[pacing.status]}55`,
+            }}
+          >
+            {PACING_STATUS_LABEL[pacing.status]}
+          </span>
+        </div>
+
+        <PacingBar
+          label="Faturamento"
+          pct={pacing.revenuePct} fracElapsed={pacing.fracElapsed}
+          displayCurrent={BRL.format(data.revenue)} displayTarget={BRL.format(data.targetRevenue)}
+          color="#3b82f6"
+        />
+        <div style={{ height: '1rem' }} />
+        <PacingBar
+          label="Faturamento collab"
+          pct={pacing.collabPct} fracElapsed={pacing.fracElapsed}
+          displayCurrent={BRL.format(data.collabRevenue)} displayTarget={BRL.format(data.targetCollabRevenue)}
+          color="var(--c5)"
+        />
+
+        <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: '0.85rem' }}>
+          Ritmo linear esperado até hoje: {BRL.format(pacing.expectedRevenue)} de faturamento. A linha
+          vertical na barra marca a posição de "hoje" no ano.
+        </p>
+      </div>
+    </>
   )
 }
 
@@ -198,6 +286,8 @@ export default function Tab1Situacao({ data }: Props) {
           color="var(--c5)"
         />
       </div>
+
+      <YearPacingCard data={data} />
 
       {data.csat === 0 ? null : (
         <>

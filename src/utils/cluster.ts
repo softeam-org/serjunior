@@ -183,6 +183,50 @@ export function fmtPct(v: number, dec = 1): string {
   return `${v.toFixed(dec)}%`
 }
 
+export type PacingStatus = 'ahead' | 'onTrack' | 'behind'
+
+export interface YearPacing {
+  /** Fração do ano civil já decorrida, 0–1. */
+  fracElapsed: number
+  daysRemaining: number
+  expectedRevenue: number
+  expectedCollabRevenue: number
+  /** Faturamento atual / meta, em %. */
+  revenuePct: number
+  /** Faturamento collab atual / meta, em %. */
+  collabPct: number
+  status: PacingStatus
+}
+
+const PACING_TOLERANCE_PP = 5
+
+/**
+ * Compara o quanto do ano civil já passou com o quanto das metas de
+ * faturamento (cumulativas — só tendem a subir ao longo do ciclo) já foi
+ * atingido, assumindo um ritmo linear ao longo do ano até a avaliação de
+ * fim de ano (31/12).
+ */
+export function getYearPacing(data: CompanyData, today: Date = new Date()): YearPacing {
+  const year = today.getFullYear()
+  const yearStart = new Date(year, 0, 1).getTime()
+  const yearEnd = new Date(year, 11, 31).getTime()
+  const totalMs = yearEnd - yearStart
+  const fracElapsed = Math.min(1, Math.max(0, (today.getTime() - yearStart) / totalMs))
+  const daysRemaining = Math.max(0, Math.ceil((yearEnd - today.getTime()) / 86_400_000))
+
+  const expectedRevenue = data.targetRevenue * fracElapsed
+  const expectedCollabRevenue = data.targetCollabRevenue * fracElapsed
+
+  const revenuePct = data.targetRevenue > 0 ? (data.revenue / data.targetRevenue) * 100 : 100
+  const collabPct = data.targetCollabRevenue > 0 ? (data.collabRevenue / data.targetCollabRevenue) * 100 : 100
+
+  const diff = revenuePct - fracElapsed * 100
+  const status: PacingStatus =
+    diff >= PACING_TOLERANCE_PP ? 'ahead' : diff <= -PACING_TOLERANCE_PP ? 'behind' : 'onTrack'
+
+  return { fracElapsed, daysRemaining, expectedRevenue, expectedCollabRevenue, revenuePct, collabPct, status }
+}
+
 export const STORAGE_KEY = 'serjunior_company_v1'
 
 export function saveData(data: CompanyData): void {

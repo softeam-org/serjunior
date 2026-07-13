@@ -241,7 +241,7 @@ export default function LandingPage() {
             </p>
           </Reveal>
           <div className="ej-grid">
-            {EJS.map((ej, i) => (
+            {EJS.sort((a, b) => a.name.localeCompare(b.name)).map((ej, i) => (
               <Reveal key={ej.id} delay={(i % 3) * 100} className="ej-card-wrap">
                 <EJCard ej={ej} />
               </Reveal>
